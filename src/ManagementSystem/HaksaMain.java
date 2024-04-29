@@ -237,10 +237,8 @@ public class HaksaMain {
                     System.out.println("잘못된 입력입니다. 다시 선택해주세요.");
             }
         }
-
     }
-
-
+//==================================================================================================
     private static void registerProfessor(Scanner scanner) {
         System.out.println("이름: ");
         String name = scanner.nextLine();
