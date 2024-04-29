@@ -6,13 +6,10 @@ import java.util.Scanner;
 public class HaksaMain {
 
     private static DataRepository repo = new DataRepository();
-    private static final String STUDENT_FILE_PATH = "C:\\students.txt";
-    private static final String PROFESSOR_FILE_PATH = "C:\\professors.txt";
-    private static final String MARKTAKE_FILE_PATH = "C:\\marktakes.txt";
 
     public static void main(String[] args) {
             Scanner scanner = new Scanner(System.in);
-            loadDataFromFile();
+
 
             while (true) {
                 System.out.println("=============================");
@@ -87,10 +84,15 @@ public class HaksaMain {
     }
 
     private static void registerStudent(Scanner scanner) {
-        System.out.println("이름: ");
+        System.out.println("이름 : ");
         String name = scanner.nextLine();
+        System.out.println("성별코드 (M/F): "); // scode 입력 추가
+        char scode = scanner.nextLine().toUpperCase().charAt(0);
         System.out.println("학번 : ");
         int id = Integer.parseInt(scanner.nextLine());
+        System.out.println("패스워드 (기본값: 0000): ");
+        String passwordInput = scanner.nextLine();
+        String password = passwordInput.isEmpty() ? "0000" : passwordInput;
         System.out.println("전공 : ");
         String major = scanner.nextLine();
         System.out.println("전화번호 : ");
@@ -99,8 +101,7 @@ public class HaksaMain {
         String email = scanner.nextLine();
         System.out.println("주소 : ");
         String address = scanner.nextLine();
-
-        Student student = new Student(name, id, major, tellnumber, email, address);
+        Student student = new Student(name, scode, id, password, major, tellnumber, email, address); // scode 추가
         repo.getStudents().add(student);
         System.out.println("학생이 성공적으로 등록되었습니다.");
     }
@@ -108,24 +109,50 @@ public class HaksaMain {
 
     private static void displayStudents() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("학생의 이름 또는 학번을 입력하세요: ");
+        System.out.println("학생의 이름 또는 학번 또는 성별을 입력하세요 ('all' 입력 시 전체 학생 목록 표시): ");
         String input = scanner.nextLine();
-        boolean found = false;
 
-        for (Student student : repo.getStudents()) {
-            if (student.getName().equals(input) || String.valueOf(student.getId()).equals(input)) {
-                System.out.println("학번: " + student.getId());
-                System.out.println("이름: " + student.getName());
-                System.out.println("전공: " + student.getMajor());
-                System.out.println("전화번호: " + student.getTellnumber());
-                System.out.println("이메일: " + student.getEmail());
-                System.out.println("주소: " + student.getAddress());
-                found = true;
+        if (input.equalsIgnoreCase("all")) {
+            if (repo.getStudents().isEmpty()) {
+                System.out.println("등록된 학생이 없습니다.");
+            } else {
+                System.out.println("전체 학생 목록:");
+                System.out.printf("%-10s%-15s%-5s%-15s%-15s%-30s%-20s%n", "학번", "이름", "성별", "전공", "전화번호", "이메일", "주소");
+                for (Student student : repo.getStudents()) {
+                    displayStudentInfo(student);
+                }
+            }
+        } else {
+            boolean found = false;
+            for (Student student : repo.getStudents()) {
+                if (studentMatchesCriteria(student, input)) {
+                    displayStudentInfo(student);
+                    found = true;
+                }
+            }
+            if (!found) {
+                System.out.println("해당하는 학생이 없습니다.");
             }
         }
+    }
 
-        if (!found) {
-            System.out.println("해당하는 학생이 없습니다.");
+    private static void displayStudentInfo(Student student) {
+        System.out.printf("%-10d%-15s%-5c%-15s%-15s%-30s%-20s%n", student.getId(), student.getName(), student.getScode(), student.getMajor(), student.getTellnumber(), student.getEmail(), student.getAddress());
+    }
+
+    private static boolean studentMatchesCriteria(Student student, String input) {
+        // 입력이 학번인 경우
+        if (input.matches("\\d+")) {
+            int id = Integer.parseInt(input);
+            return student.getId() == id;
+        }
+        // 입력이 성별인 경우
+        else if (input.equalsIgnoreCase("M") || input.equalsIgnoreCase("F")) {
+            return student.getScode() == input.charAt(0);
+        }
+        // 입력이 이름인 경우
+        else {
+            return student.getName().equalsIgnoreCase(input);
         }
     }
 
@@ -136,6 +163,8 @@ public class HaksaMain {
             if (s.getId() == id) {
                 System.out.println("새로 입력할 이름: ");
                 String name = scanner.nextLine();
+                System.out.println("새로 입력할 성별코드 (M/F): "); // scode 입력 추가
+                char scode = scanner.nextLine().toUpperCase().charAt(0);
                 System.out.println("새로 입력할 전공 : ");
                 String major = scanner.nextLine();
                 System.out.println("새로운 전화번호 : ");
@@ -146,6 +175,7 @@ public class HaksaMain {
                 String address = scanner.nextLine();
 
                 s.setName(name);
+                s.setScode(scode); // scode 추가
                 s.setMajor(major);
                 s.setTellnumber(tellnumber);
                 s.setEmail(email);
@@ -209,13 +239,21 @@ public class HaksaMain {
         }
 
     }
+
+
     private static void registerProfessor(Scanner scanner) {
         System.out.println("이름: ");
         String name = scanner.nextLine();
+        System.out.println("성별 코드 (M/F): ");
+        char scode = scanner.nextLine().charAt(0);
+
         System.out.println("교직원번호 : ");
         int id = Integer.parseInt(scanner.nextLine());
         System.out.println("전공 : ");
         String major = scanner.nextLine();
+        System.out.println("패스워드 (기본값: 0000): ");
+        String passwordInput = scanner.nextLine();
+        String password = passwordInput.isEmpty() ? "0000" : passwordInput;
         System.out.println("전화번호 : ");
         String tellnumber = scanner.nextLine();
         System.out.println("이메일 : ");
@@ -227,9 +265,21 @@ public class HaksaMain {
         System.out.println("입사일자: ");
         String hiredate = scanner.nextLine();
 
-        Professor professor = new Professor(name, id, major, tellnumber, email, address, grade, hiredate);
+        Professor professor = new Professor(name,scode, id, password, major, tellnumber, email, address, grade, hiredate);
         repo.getProfessors().add(professor);
         System.out.println("교수가 성공적으로 등록되었습니다.");
+    }
+
+    private static void displayProfessors() {
+        if (repo.getProfessors().isEmpty()) {
+            System.out.println("등록된 교수가 없습니다.");
+        } else {
+            System.out.println("전체 교수 목록:");
+            System.out.printf("%-15s%-20s%-5s%-20s%-15s%-30s%-20s%n", "교직원번호", "이름", "성별", "전공", "전화번호", "이메일", "주소");
+            for (Professor professor : repo.getProfessors()) {
+                System.out.printf("%-15d%-20s%-5c%-20s%-15s%-30s%-20s%n", professor.getId(), professor.getName(), professor.getScode(), professor.getMajor(), professor.getTellnumber(), professor.getEmail(), professor.getAddress());
+            }
+        }
     }
 
     private static void updateProfessor(Scanner scanner) {
@@ -247,28 +297,21 @@ public class HaksaMain {
                 String email = scanner.nextLine();
                 System.out.println("새로운 주소 : ");
                 String address = scanner.nextLine();
+                System.out.println("새로운 성별 코드 (M/F): ");
+                char scode = scanner.nextLine().charAt(0);
 
                 professor.setName(name);
                 professor.setMajor(major);
                 professor.setTellnumber(tellnumber);
                 professor.setEmail(email);
                 professor.setAddress(address);
+                professor.setScode(scode);
                 System.out.println("교수 정보가 업데이트 되었습니다.");
                 return;
             }
         }
         System.out.println("해당 교직원번호의 교수를 찾을 수 없습니다.");
     }
-
-    private static void displayProfessors() {
-        System.out.println("등록된 교수 목록:");
-        for (Professor professor : repo.getProfessors()) {
-            System.out.println(professor.getId() + " " + professor.getName() + " " + professor.getMajor() + " " + professor.getTellnumber()
-                    + " " + professor.getEmail() + " " + professor.getAddress());
-        }
-    }
-
-
 
     private static void deleteProfessor(Scanner scanner) {
         System.out.println("삭제할 교수의 교직원번호를 입력하세요: ");
@@ -411,57 +454,5 @@ public class HaksaMain {
         }
         System.out.println("해당 이름의 학과를 찾을 수 없습니다.");
     }
-    private static void loadDataFromFile() {
-        loadStudentsFromFile();
-        loadProfessorsFromFile();
-        loadMarktakesFromFile();
-    }
-
-    private static void loadStudentsFromFile() {
-        try (Scanner scanner = new Scanner(new File(STUDENT_FILE_PATH))) {
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                String[] parts = line.split(",");
-                if (parts.length == 6) {
-                    Student student = new Student(parts[1], Integer.parseInt(parts[0]), parts[2], parts[3], parts[4], parts[5]);
-                    repo.getStudents().add(student);
-                }
-            }
-        } catch (FileNotFoundException e) {
-            System.err.println("학생 파일을 찾을 수 없습니다.");
-        }
-    }
-
-    private static void loadProfessorsFromFile() {
-        try (Scanner scanner = new Scanner(new File(PROFESSOR_FILE_PATH))) {
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                String[] parts = line.split(",");
-                if (parts.length == 8) {
-                    Professor professor = new Professor(parts[1], Integer.parseInt(parts[0]), parts[2], parts[3],
-                            parts[4], parts[5], parts[6], parts[7]);
-                    repo.getProfessors().add(professor);
-                }
-            }
-        } catch (FileNotFoundException e) {
-            System.err.println("교수 파일을 찾을 수 없습니다.");
-        }
-    }
-
-    private static void loadMarktakesFromFile() {
-        try (Scanner scanner = new Scanner(new File(MARKTAKE_FILE_PATH))) {
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                String[] parts = line.split(",");
-                if (parts.length == 3) {
-                    Marktake marktake = new Marktake(parts[0], parts[1], parts[2]);
-                    repo.getMarktakes().add(marktake);
-                }
-            }
-        } catch (FileNotFoundException e) {
-            System.err.println("성적 파일을 찾을 수 없습니다.");
-        }
-    }
-
 
 }   // end of class SchoolManagementEx

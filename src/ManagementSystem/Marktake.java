@@ -1,7 +1,7 @@
 package ManagementSystem;
 // 학점클래스
 public class Marktake {
-    private String id;		//학번
+    private String id;		//학번 : 학번으로  Person클래스와 연계해 검색해 볼 생각이였으나 수정을 해도 연계실폐
     private String subject;	//과목코드
     private String score;	//점수
 

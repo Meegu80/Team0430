@@ -7,8 +7,8 @@ public class Professor extends Person{
     public Professor(){
     }
 
-    public Professor(String name, int id, String major, String tellnumber, String email, String address, String grade, String hiredate) {
-        super(name, id, major, tellnumber, email, address);
+    public Professor(String name, char scode, int id, String password, String major, String tellnumber, String email, String address, String grade, String hiredate) {
+        super(name, scode, id, password, major, tellnumber, email, address);
         this.grade = grade;
         this.hiredate = hiredate;
     }
@@ -27,14 +27,6 @@ public class Professor extends Person{
 
     public void setHiredate(String hiredate) {
         this.hiredate = hiredate;
-    }
-
-    @Override
-    public String toString() {
-        return "Professor{" +
-                "grade='" + grade + '\'' +
-                ", hiredate='" + hiredate + '\'' +
-                '}';
     }
 }
 
